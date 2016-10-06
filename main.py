@@ -12,47 +12,65 @@ import time
 @click.option('--rate','-x',default=60,help="How long to wait to another run (in seconds).")
 @click.option('--default','-d',default="default",help="Default label if none of rules will match.")
 @click.option('--comments','-k',is_flag="True",help="Controls if you also search in comments.")
+@click.option('--verbose','-v',count="True",help='Enables verbouse output.')
 
-def run(config,repository,rules,rate,default,comments):
-	print("Config: "+config+", repository: "+repository+", file with rules: "+rules+", rate: "+str(rate)+", default label:"+default+", process comments flag: "+str(comments))
+def run(config,repository,rules,rate,default,comments,verbose):
+	if verbose == 2:
+		print("Parsed arguments:")
+		print("Config file: "+config+", repository: "+repository+", file with rules: "+rules+", rate: "+str(rate)+", default label:"+default+", process comments flag: "+str(comments))
 	token,username=readConfig(config)
 	session=createSession(token)
 	
 	while True:
 		print("Checking issues...")
-		labelIssues(session,repository,username,rules,default,comments)
+		labelIssues(session,repository,username,rules,default,comments,verbose)
 		time.sleep(rate)
 	
 
 
 
 def readConfig(config):
-	tokenConfig = configparser.ConfigParser()
-	tokenConfig.read(config)
-	#TODO osetrit neexistujici konfig
-	token=tokenConfig["github"]["token"]
-	username=tokenConfig["github"]["username"]
-	#TODO osetrit neexistujici direktivy
-	return token,username
+	try:
+		tokenConfig = configparser.ConfigParser()
+		tokenConfig.read(config)
+		token=tokenConfig["github"]["token"]
+		username=tokenConfig["github"]["username"]
+		return token,username
+	except KeyError:
+		print("Nonexistent or unreadable configuration file or it is missing directive.")
+		exit(1)
 	
 def readRules(rules):
-	with open(rules) as f:
-		content = f.readlines()
+	try:
+		with open(rules) as f:
+			content = f.readlines()
+		
+	except:
+		print("Cant read files with rules.")
+		exit(1)
 	return content
-
 
 def createSession(token):
 	session=requests.Session()
 	session.headers={'Authorization': 'token ' + token, 'User-Agent': 'Python'}
 	return session
 	
-def labelIssues(session,repository,username,rules,default,comments):
+def labelIssues(session,repository,username,rules,default,comments,verbose):
 
 	#get all issues of specified repository
 	query = "https://api.github.com/repos/"+username+"/"+repository+"/issues"
-	r = session.get(query)
-	
-	#TODO osetrit chyby
+	try:
+		r = session.get(query)
+		r.raise_for_status()
+	except requests.ConnectionError:
+		print("Error in communication.")
+		exit(1)
+	except requests.HTTPError:
+		print("Wrong HTTP code. Maybe wrong token, nonexistent repository, your token doesnt have access rights, etc.")
+		exit(1) 
+	except requests.Timeout:
+		print("Timeouted.")
+		exit(1)
 	
 	#read all rules
 	content=readRules(rules)
@@ -79,33 +97,42 @@ def labelIssues(session,repository,username,rules,default,comments):
 				#prepare regex
 				pattern = re.compile(rule)
 				
+				
 				#test body of issue if matches regex
 				if pattern.search(issue["body"]):
-					print("Match!")
+					if verbose:
+						print("Match!")
 					matched=True
-					
-					#check if label with this name exists
-					if not getLabel(session,repository,username,label):
-						#if label doesnt exist, create it
-						print("Creating new label...")
-						createLabel(session,repository,username,label,color)
-					else:
-						print("Label "+label+" already exists...")
-					#add label to issue	
-					print("Adding label: "+label+" to issue: "+issue["title"])
+					testAndCreateLabel(session,repository,username,label,color)
 					addLabel(session,repository,username,label,issue["number"])
-						
-				else:
-					print("No match.")
 			
+				#get comments
+				if comments:
+					if verbose:
+						print("Processing comments...")
+					issueComments=getComments(session,repository,username,issue["number"])
+					for comment in issueComments:
+						if pattern.search(comment["body"]):
+							matched=True
+							if verbose:
+								print("Match in comment.")
+							testAndCreateLabel(session,repository,username,label,color)
+							addLabel(session,repository,username,label,issue["number"])
+							
 			#if no rule matched this issue, we add default label
 			if not matched:
-				#check if default label already exists
-				if not getLabel(session,repository,username,label):
-					#if default label doesnt exists, create it
-					createLabel(session,repository,username,default,"7a7a7a")
-				#add default label
+				testAndCreateLabel(session,repository,username,default,"7a7a7a")
 				addLabel(session,repository,username,default,issue["number"])
+	
+
+def testAndCreateLabel(session,repository,username,label,color):
+	#check if label with this name exists
+	if not getLabel(session,repository,username,label):
+		#if label doesnt exist, create it
+		print("Creating new label...")
+		createLabel(session,repository,username,label,color)
+	else:
+		print("Label "+label+" already exists...")
 	
 def getLabel(session,repository,username,name):
 	query="https://api.github.com/repos/"+username+"/"+repository+"/labels/"+name
@@ -114,19 +141,52 @@ def getLabel(session,repository,username,name):
 		return False
 	else:
 		return True		
+def getComments(session,repository,username,number):
+	query="https://api.github.com/repos/"+username+"/"+repository+"/issues/"+str(number)+"/comments"
+	try:
+		r=session.get(query)
+		r.raise_for_status()
+	except requests.ConnectionError:
+		print("Error in communication.")
+		exit(1)
+	except requests.HTTPError:
+		print("Wrong HTTP code. Maybe wrong token, nonexistent repository, your token doesnt have access rights, etc.")
+		exit(1) 
+	except requests.Timeout:
+		print("Timeouted.")
+		exit(1)
+	return r.json()
 
 def createLabel(session,repository,username,label,color):
 	query="https://api.github.com/repos/"+username+"/"+repository+"/labels"
 	print("creating label: "+label+" with color: "+color)
-	session.post(query,data='{"name": "'+label+'", "color": "'+color+'"}')
-	#TODO navratovy kod
-	
+	try:
+		r=session.post(query,data='{"name": "'+label+'", "color": "'+color+'"}')
+		r.raise_for_status()
+	except requests.ConnectionError:
+		print("Error in communication.")
+		exit(1)
+	except requests.HTTPError:
+		print("Wrong HTTP code. Maybe wrong token, nonexistent repository, your token doesnt have access rights, etc.")
+		exit(1) 
+	except requests.Timeout:
+		print("Timeouted.")
+		exit(1)
+		
 def addLabel(session,repository,username,label,number):
 	query="https://api.github.com/repos/"+username+"/"+repository+"/issues/"+str(number)+"/labels"
-	session.post(query,data='["'+label+'"]')
-	#TODO navratovy kod
-	
-	
+	try:
+		r=session.post(query,data='["'+label+'"]')
+		r.raise_for_status()
+	except requests.ConnectionError:
+		print("Error in communication.")
+		exit(1)
+	except requests.HTTPError:
+		print("Wrong HTTP code. Maybe wrong token, nonexistent repository, your token doesnt have access rights, etc.")
+		exit(1) 
+	except requests.Timeout:
+		print("Timeouted.")
+		exit(1)
 	
 
 if __name__ == '__main__':
