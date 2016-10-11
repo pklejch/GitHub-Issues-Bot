@@ -21,9 +21,15 @@ def run(config,repository,rules,rate,default,comments,verbose):
 	token,username=readConfig(config)
 	session=createSession(token)
 	
+	
+	#read all rules
+	content=readRules(rules)
+	
+	
 	while True:
-		print("Checking issues...")
-		labelIssues(session,repository,username,rules,default,comments,verbose)
+		if verbose:
+			print("Checking issues...")
+		labelIssues(session,repository,username,rules,default,comments,verbose,content)
 		time.sleep(rate)
 	
 
@@ -44,8 +50,7 @@ def readRules(rules):
 	try:
 		with open(rules) as f:
 			content = f.readlines()
-		
-	except:
+	except EnvironmentError:
 		print("Cant read files with rules.")
 		exit(1)
 	return content
@@ -55,7 +60,7 @@ def createSession(token):
 	session.headers={'Authorization': 'token ' + token, 'User-Agent': 'Python'}
 	return session
 	
-def labelIssues(session,repository,username,rules,default,comments,verbose):
+def labelIssues(session,repository,username,rules,default,comments,verbose,content):
 
 	#get all issues of specified repository
 	query = "https://api.github.com/repos/"+username+"/"+repository+"/issues"
@@ -72,9 +77,9 @@ def labelIssues(session,repository,username,rules,default,comments,verbose):
 		print("Timeouted.")
 		exit(1)
 	
-	#read all rules
-	content=readRules(rules)
+
 	
+	#for each issue
 	for issue in r.json():	
 		
 		#issue doesnt have a label
@@ -83,27 +88,40 @@ def labelIssues(session,repository,username,rules,default,comments,verbose):
 			#for each rule
 			matched=False
 			for line in content:
-				line=line.strip()
+			
+				line = line.strip()
 				if line.startswith("#") or line == "":
 					continue
-					
-				#parse rule and label with color
-				rule,labelAndColor = line.split("=")
-				rule = rule.strip()
-				label,color = labelAndColor.split(",")
-				label=label.strip()
-				color=color.strip()
+
+				res = re.match("^\s*([^#]+)\s*=\s*(\w+)\s*(,\s*([0-9a-fA-F]{6}))?\s*$",line)
+				if not res:
+					continue
+
+				
+				#get rule and label from configuration file
+				rule = res.group(1)
+				label = res.group(2)
+				
+				
+				#if color isnt specified, use default color
+				if res.group(4):
+					color = res.group(4)
+				else:
+					color = "7a7a7a"
+				
+				if verbose == 2:
+					print("PARSED: rule: "+rule+", label: "+label+", color: "+color)
 				
 				#prepare regex
 				pattern = re.compile(rule)
 				
 				
-				#test body of issue if matches regex
-				if pattern.search(issue["body"]):
-					if verbose:
-						print("Match!")
+				#test if body (or title) of issue matches regex
+				if pattern.search(issue["body"]) or pattern.search(issue["title"]):
+					if verbose == 2:
+						print("Match in "+rule+" and issue #"+str(issue["number"]))
 					matched=True
-					testAndCreateLabel(session,repository,username,label,color)
+					testAndCreateLabel(session,repository,username,label,color,verbose)
 					addLabel(session,repository,username,label,issue["number"])
 			
 				#get comments
@@ -114,25 +132,27 @@ def labelIssues(session,repository,username,rules,default,comments,verbose):
 					for comment in issueComments:
 						if pattern.search(comment["body"]):
 							matched=True
-							if verbose:
-								print("Match in comment.")
-							testAndCreateLabel(session,repository,username,label,color)
+							if verbose == 2:
+								print("Match in "+rule+" and comment "+comment["body"])
+							testAndCreateLabel(session,repository,username,label,color,verbose)
 							addLabel(session,repository,username,label,issue["number"])
 							
 			#if no rule matched this issue, we add default label
 			if not matched:
-				testAndCreateLabel(session,repository,username,default,"7a7a7a")
+				testAndCreateLabel(session,repository,username,default,"7a7a7a",verbose)
 				addLabel(session,repository,username,default,issue["number"])
 	
 
-def testAndCreateLabel(session,repository,username,label,color):
+def testAndCreateLabel(session,repository,username,label,color,verbose):
 	#check if label with this name exists
 	if not getLabel(session,repository,username,label):
 		#if label doesnt exist, create it
-		print("Creating new label...")
+		if verbose == 2:
+			print("Creating new label: "+label+", with color: "+color)
 		createLabel(session,repository,username,label,color)
 	else:
-		print("Label "+label+" already exists...")
+		if verbose == 2:
+			print("Label "+label+" already exists.")
 	
 def getLabel(session,repository,username,name):
 	query="https://api.github.com/repos/"+username+"/"+repository+"/labels/"+name
@@ -140,7 +160,9 @@ def getLabel(session,repository,username,name):
 	if r.status_code == 404:
 		return False
 	else:
-		return True		
+		return True
+		
+		
 def getComments(session,repository,username,number):
 	query="https://api.github.com/repos/"+username+"/"+repository+"/issues/"+str(number)+"/comments"
 	try:
@@ -159,7 +181,6 @@ def getComments(session,repository,username,number):
 
 def createLabel(session,repository,username,label,color):
 	query="https://api.github.com/repos/"+username+"/"+repository+"/labels"
-	print("creating label: "+label+" with color: "+color)
 	try:
 		r=session.post(query,data='{"name": "'+label+'", "color": "'+color+'"}')
 		r.raise_for_status()
@@ -187,7 +208,7 @@ def addLabel(session,repository,username,label,number):
 	except requests.Timeout:
 		print("Timeouted.")
 		exit(1)
-	
+		
 
 if __name__ == '__main__':
 	run()
