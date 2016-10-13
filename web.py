@@ -24,7 +24,7 @@ def hook():
     print(signature)
     body = request.data
     verifySecret(signature,body)
-
+    print("OK")
     token, username = main.readConfig("auth.conf")
     session = main.createSession(token)
     # read all rules

@@ -60,7 +60,7 @@ def readConfig(config):
         return token,username
     except KeyError:
         print("Nonexistent or unreadable configuration"
-              "file or it is missing directive.")
+              " file or it is missing directive.")
         exit(1)
 
 def readSecret(config):
@@ -71,7 +71,7 @@ def readSecret(config):
         return secret
     except KeyError:
         print("Nonexistent or unreadable configuration"
-              "file or it is missing directive.")
+              " file or it is missing directive.")
         exit(1)
 
 
