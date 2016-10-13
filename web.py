@@ -20,7 +20,7 @@ def hook():
     data = request.get_json()
 
     # get only the signature from signature head in HTTP request
-    signature = request.headers['X-Hub-Signature']
+    signature = request.headers['X-Hub-Signature'].split("=")[1]
     print(signature)
     body = request.data
     verifySecret(signature,body)
