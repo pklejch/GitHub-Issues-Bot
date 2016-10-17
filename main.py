@@ -12,7 +12,6 @@ def cli():
 
 @cli.command()
 def web():
-    print("Running web part")
     import web
     web.app.run(debug=False)
 
@@ -31,7 +30,6 @@ def web():
               help="Controls if you also search in comments.")
 @click.option('--verbose', '-v',count="True", help='Enables verbouse output.')
 def console(config,repository,rules,rate,default,comments,verbose):
-    print("Running console part")
     if verbose == 2:
         print("Parsed arguments:")
         print("Config file: "+config+", repository: "+repository+
@@ -121,7 +119,6 @@ def labelIssues(session,repository,username,
 
     # for each issue
     for issue in issues:
-        print(issue)
         # issue doesnt have a label
         if not issue["labels"]:
 

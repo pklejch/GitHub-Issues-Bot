@@ -15,7 +15,6 @@ def verifySecret(signature,body):
 
     # if signature and calculated hash doesnt match, abort with error code 403
     if not str(mac.hexdigest()) == signature:
-        #print(mac.hexdigest()+" vs. "+signature)
         abort(403)
 
 @app.route('/hook', methods=['POST'])
@@ -31,12 +30,13 @@ def hook():
 
     token, username = main.readConfig("auth.conf")
     session = main.createSession(token)
+
     # read all rules
     content = main.readRules("rules.conf")
     if data["action"] == "opened":
         main.labelIssues(session, "MI-PYT-TestRepo", username,
                      "default", False,
-                     2, content, data["issue"])
+                     0, content, data["issue"])
 
     return ''
 
