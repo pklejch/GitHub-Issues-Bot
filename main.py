@@ -113,6 +113,7 @@ def labelIssues(session,repository,username,
     if issues is None:
         issues=r.json()
 
+    print(issues)
     # for each issue
     for issue in issues:
 
