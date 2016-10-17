@@ -29,9 +29,10 @@ def hook():
     session = main.createSession(token)
     # read all rules
     content = main.readRules("rules.conf")
-    main.labelIssues(session, "MI-PYT-TestRepo", username,
+    if data["action"] == "opened":
+        main.labelIssues(session, "MI-PYT-TestRepo", username,
                      "default", False,
-                     2, content)
+                     2, content, data["issue"])
 
     return ''
 

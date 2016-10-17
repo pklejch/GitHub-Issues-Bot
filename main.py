@@ -47,7 +47,7 @@ def console(config,repository,rules,rate,default,comments,verbose):
             print("Checking issues...")
         labelIssues(session,repository,username,
                     default,comments,
-                    verbose,content)
+                    verbose,content,None)
         time.sleep(rate)
 
 
@@ -92,7 +92,7 @@ def createSession(token):
 
 
 def labelIssues(session,repository,username,
-                default,comments,verbose,content):
+                default,comments,verbose,content,issues):
 
     # get all issues of specified repository
     query = "https://api.github.com/repos/"+username+"/"+repository+"/issues"
@@ -110,8 +110,11 @@ def labelIssues(session,repository,username,
     except requests.Timeout:
         print("Timeouted.")
         exit(1)
+    if issues is None:
+        issues=r.json()
+
     # for each issue
-    for issue in r.json():
+    for issue in issues:
 
         # issue doesnt have a label
         if not issue["labels"]:
