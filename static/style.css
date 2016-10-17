@@ -1,0 +1,33 @@
+body{
+    background-color: #A5D6D9;
+    font-family: Verdana, Geneva, sans-serif;
+}
+ol{
+    counter-reset: myCounter;
+}
+li{
+    list-style: none;
+}
+ol li:before {
+    counter-increment: myCounter;
+    content:counter(myCounter);
+    color: white;
+    background: #2980B9;
+    display: inline-block;
+    text-align: center;
+    margin: 5px 10px;
+    line-height: 40px;
+    width: 40px;
+    height: 40px;
+}
+ul li:before{
+    content: "•";
+    color: white;
+    background: #9C1A1C;
+    display: inline-block;
+    text-align: center;
+    margin: 5px 10px;
+    line-height: 40px;
+    width: 40px;
+    height: 40px;
+}
