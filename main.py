@@ -93,30 +93,35 @@ def createSession(token):
 
 def labelIssues(session,repository,username,
                 default,comments,verbose,content,issues):
-
-    # get all issues of specified repository
-    query = "https://api.github.com/repos/"+username+"/"+repository+"/issues"
-    try:
-        r = session.get(query)
-        r.raise_for_status()
-    except requests.ConnectionError:
-        print("Error in communication.")
-        exit(1)
-    except requests.HTTPError:
-        print("Wrong HTTP code. Maybe wrong token, "
-              "nonexistent repository, your token doesnt "
-              "have access rights, etc.")
-        exit(1)
-    except requests.Timeout:
-        print("Timeouted.")
-        exit(1)
+    # launching labelIssues from console, fetch all issues from repository
     if issues is None:
+        # get all issues of specified repository
+        query = "https://api.github.com/repos/" + username + "/" + repository + "/issues"
+        try:
+            r = session.get(query)
+            r.raise_for_status()
+        except requests.ConnectionError:
+            print("Error in communication.")
+            exit(1)
+        except requests.HTTPError:
+            print("Wrong HTTP code. Maybe wrong token, "
+                  "nonexistent repository, your token doesnt "
+                  "have access rights, etc.")
+            exit(1)
+        except requests.Timeout:
+            print("Timeouted.")
+            exit(1)
         issues=r.json()
+    # launching labelIssues from web, add issue to list
+    else:
+        issuesTmp=list()
+        issuesTmp.append(issues)
+        issues=issuesTmp
 
-    print(issues)
+
     # for each issue
     for issue in issues:
-
+        print(issue)
         # issue doesnt have a label
         if not issue["labels"]:
 
