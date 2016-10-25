@@ -273,5 +273,5 @@ def addLabel(session, repository, username, label, number):
         exit(1)
 
 
-if __name__ == '__main__':
+def main():
     cli()

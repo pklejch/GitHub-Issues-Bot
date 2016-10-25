@@ -1,0 +1,6 @@
+include LICENSE
+include github-issue-labeler/auth.conf.sample
+include github-issue-labeler/rules.conf
+include github-issue-labeler/static/*
+include github-issue-labeler/templates/*
+
