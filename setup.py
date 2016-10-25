@@ -32,4 +32,5 @@ setup(
             'issuelabeler = issuelabeler.issuelabel:main',
         ],
     },
+    include_package_data=True,
 )
