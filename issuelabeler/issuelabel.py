@@ -17,11 +17,11 @@ def web():
 
 
 @cli.command()
-@click.option('--config', '-c', default="issuelabeler/auth.conf",
+@click.option('--config', '-c', default="auth.conf",
               help='Configuration file with authorization tokens.')
 @click.option('--repository', '-r', default='MI-PYT-TestRepo',
               help='Target repository which going to be processed.')
-@click.option('--rules', '-f', default='issuelabeler/rules.conf', help='File with rules.')
+@click.option('--rules', '-f', default='rules.conf', help='File with rules.')
 @click.option('--rate', '-x', default=60,
               help="How long to wait to another run (in seconds).")
 @click.option('--default', '-d', default="default",
