@@ -1,3 +1,4 @@
-from .issuelabel import console, web
+from .issuelabel import labelIssues, web
 
-__all__ = ['console','web']
+# if user use from package import *
+__all__ = ['labelIssues','web']
