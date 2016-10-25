@@ -26,7 +26,7 @@ setup(
 	'Programming Language :: Python :: Implementation :: CPython',
 	'Topic :: Internet :: WWW/HTTP :: WSGI :: Application'
         ],
-    install_requires=['Flask', 'click>=6'],
+    install_requires=['Flask', 'click>=6','requests'],
     entry_points={
         'console_scripts': [
             'issuelabeler = issuelabeler:main',
