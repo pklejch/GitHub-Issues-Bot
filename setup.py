@@ -27,4 +27,9 @@ setup(
 	'Topic :: Internet :: WWW/HTTP :: WSGI :: Application'
         ],
     install_requires=['Flask', 'click>=6'],
+    entry_points={
+        'console_scripts': [
+            'issuelabeler = issuelabeler:main',
+        ],
+    },
 )
