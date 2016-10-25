@@ -3,7 +3,7 @@ import click
 import requests
 import re
 import time
-
+import os
 
 @click.group()
 def cli():
@@ -12,16 +12,16 @@ def cli():
 
 @cli.command()
 def web():
-    import web
-    web.app.run(debug=False)
+    from .web import app
+    app.run(debug=False)
 
 
 @cli.command()
-@click.option('--config', '-c', default="auth.conf",
+@click.option('--config', '-c', default="issuelabeler/auth.conf",
               help='Configuration file with authorization tokens.')
 @click.option('--repository', '-r', default='MI-PYT-TestRepo',
               help='Target repository which going to be processed.')
-@click.option('--rules', '-f', default='rules.conf', help='File with rules.')
+@click.option('--rules', '-f', default='issuelabeler/rules.conf', help='File with rules.')
 @click.option('--rate', '-x', default=60,
               help="How long to wait to another run (in seconds).")
 @click.option('--default', '-d', default="default",
@@ -31,6 +31,7 @@ def web():
 @click.option('--verbose', '-v', count="True", help='Enables verbouse output.')
 def console(config, repository, rules, rate, default, comments, verbose):
     if verbose == 2:
+        print(os.getcwd() + "\n")
         print("Parsed arguments:")
         print("Config file: " + config + ", repository: " + repository +
               ", file with rules: " + rules + ", rate: " + str(rate) +

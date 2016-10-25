@@ -1,3 +1,3 @@
-from .issuelabeler import main
+from .issuelabel import main
 
 main()

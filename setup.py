@@ -29,7 +29,7 @@ setup(
     install_requires=['Flask', 'click>=6','requests'],
     entry_points={
         'console_scripts': [
-            'issuelabeler = issuelabeler:main',
+            'issuelabeler = issuelabeler.issuelabel:main',
         ],
     },
 )

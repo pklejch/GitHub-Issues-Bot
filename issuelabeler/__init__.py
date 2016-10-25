@@ -1,3 +1,3 @@
-from .issuelabeler import main
+from .issuelabel import console, web
 
-__all__ = ['main']
+__all__ = ['console','web']
