@@ -21,7 +21,6 @@ with betamax.Betamax.configure() as config:
     config.cassette_library_dir = 'tests/fixtures/cassettes'
 
 
-
 @pytest.fixture
 def mySession(betamax_session):
     betamax_session.headers = {'Authorization': 'token ' + TOKEN, 'User-Agent': 'Python'}
@@ -31,9 +30,9 @@ def mySession(betamax_session):
 # return faked parsed rules
 @pytest.fixture
 def content():
-    return ['bug=bug,ff0000','error=bug,ff0000','bot=bot,0000ff',
-            '.*=all,ffffff','0x[a-fA-F0-9]+=hexa,00ff00',
-            'klejcpet=cool,3e4dd4','@fit.cvut.cz=FIT,238cec',
+    return ['bug=bug,ff0000', 'error=bug,ff0000', 'bot=bot,0000ff',
+            '.*=all,ffffff', '0x[a-fA-F0-9]+=hexa,00ff00',
+            'klejcpet=cool,3e4dd4', '@fit.cvut.cz=FIT,238cec',
             '([0-9]{1,3}\.){3}[0-9]{1,3}=ipv4,66cccc']
 
 
@@ -45,12 +44,20 @@ def test_labelIssues(mySession, default, comments):
 
 
 # test existent labels
-@pytest.mark.parametrize('name',('bot','FIT','hexa','ipv4'))
+@pytest.mark.parametrize('name', ('bot', 'FIT', 'hexa', 'ipv4'))
 def test_getLabel(mySession, name):
     assert True == issuelabel.getLabel(mySession, 'MI-PYT-TestRepo', 'pklejchbot', name)
 
 
 # test nonexistent labels
-@pytest.mark.parametrize('name',('critical','nonexistentlabel','ipv6'))
+@pytest.mark.parametrize('name', ('critical', 'nonexistentlabel', 'ipv6'))
 def test_getLabel2(mySession, name):
-    assert False == issuelabel.getLabel(mySession, 'MI-PYT-TestRepo', 'pklejchbot', name)
+    assert not issuelabel.getLabel(mySession, 'MI-PYT-TestRepo', 'pklejchbot', name)
+
+
+# test create label
+# i create label and then test if it is available
+@pytest.mark.parametrize(('label', 'color'), (('test1', '0000ff'), ('test2', 'ff0000'), ('test3', '00ff00')))
+def test_createLabel(mySession, label, color):
+    issuelabel.createLabel(mySession, 'MI-PYT-TestRepo', 'pklejchbot', label, color)
+    assert True == issuelabel.getLabel(mySession, 'MI-PYT-TestRepo', 'pklejchbot', label)
