@@ -27,6 +27,8 @@ setup(
 	'Topic :: Internet :: WWW/HTTP :: WSGI :: Application'
         ],
     install_requires=['Flask', 'click>=6','requests'],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest','betamax'],
     entry_points={
         'console_scripts': [
             'issuelabeler = issuelabeler.issuelabel:main',

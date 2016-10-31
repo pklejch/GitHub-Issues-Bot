@@ -230,7 +230,7 @@ def getComments(session, repository, username, number):
               "have access rights, etc.")
         exit(1)
     except requests.Timeout:
-        print("Timeouted.")
+        print("Timeout.")
         exit(1)
     return r.json()
 
@@ -251,7 +251,7 @@ def createLabel(session, repository, username, label, color):
               "have access rights, etc.")
         exit(1)
     except requests.Timeout:
-        print("Timeouted.")
+        print("Timeout.")
         exit(1)
 
 
@@ -270,7 +270,7 @@ def addLabel(session, repository, username, label, number):
               "have access rights, etc.")
         exit(1)
     except requests.Timeout:
-        print("Timeouted.")
+        print("Timeout.")
         exit(1)
 
 
