@@ -45,6 +45,7 @@ def content():
 
 
 # test main function labelIssues
+# this is complex test and uses all functions
 @pytest.mark.parametrize('default', ('default', 'vychozi', 'normal'))
 @pytest.mark.parametrize('comments', (True, False))
 def test_labelIssues(mySession, default, comments):
@@ -65,16 +66,19 @@ def test_getLabel2(mySession, name):
 
 
 # test create label
-# i create new unique label and then test if it is available
-@pytest.mark.parametrize(('label', 'color'), ((createRandomString(10), '0000ff'),
-                                              (createRandomString(10), 'ff0000'),
-                                              (createRandomString(10), '00ff00')))
+# i create new label and then test if it is available
+@pytest.mark.parametrize(('label', 'color'), (('test1', '0000ff'),
+                                              ('test2', 'ff0000'),
+                                              ('test3', '00ff00')))
 def test_createLabel(mySession, label, color):
-    issuelabeler.issuelabel.createLabel(mySession, 'MI-PYT-TestRepo', username, label, color)
-    assert True == issuelabeler.issuelabel.getLabel(mySession, 'MI-PYT-TestRepo', username, label)
+    issuelabeler.issuelabel.testAndCreateLabel(mySession, 'MI-PYT-TestRepo', username, label, color, 2)
+
+# test function get Issues
+def test_getIssues(mySession):
+    assert "Test Issue 1" in issuelabeler.issuelabel.getIssues(mySession,'MI-PYT-TestRepo',username)[-1]["title"]
 
 
-
+# create testing web app
 @pytest.fixture
 def testapp():
     from issuelabeler import web
@@ -82,6 +86,7 @@ def testapp():
     return web.app.test_client()
 
 
+# test default route /
 def test_hello(testapp):
     assert 'How to use GitHub Issue Bot' in testapp.get('/').data.decode('utf-8')
 
