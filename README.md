@@ -6,6 +6,13 @@ Don't forget to fill auth.conf configuration file.
 
 ## How to test
 Run:
-python setup.py test
+
+*python setup.py test*
+
 or
-pytest -v tests/test_app.py
+
+*pytest -v tests/test_app.py*
+
+If you have filled auth.conf with right values, you can use online testing. With real HTTP requests. Eg:
+
+*AUTH_FILE=issuelabeler/auth.conf pytest -v tests/test_app.py*
