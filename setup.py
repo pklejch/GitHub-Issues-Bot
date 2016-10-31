@@ -20,19 +20,22 @@ setup(
         'Intended Audience :: Developers',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 3.5',
-	'Development Status :: 3 - Alpha',
-	'Framework :: Flask',
-	'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-	'Programming Language :: Python :: Implementation :: CPython',
-	'Topic :: Internet :: WWW/HTTP :: WSGI :: Application'
+        'Development Status :: 3 - Alpha',
+        'Framework :: Flask',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Topic :: Internet :: WWW/HTTP :: WSGI :: Application'
         ],
-    install_requires=['Flask', 'click>=6','requests'],
+    install_requires=['Flask', 'click>=6', 'requests'],
     setup_requires=['pytest-runner'],
-    tests_require=['pytest','betamax'],
+    tests_require=['pytest', 'betamax'],
     entry_points={
         'console_scripts': [
             'issuelabeler = issuelabeler.issuelabel:main',
         ],
     },
-    include_package_data=True,
+    package_data={
+        'issuelabeler': ['static/*','templates/*']
+    },
+    #include_package_data=True,
 )

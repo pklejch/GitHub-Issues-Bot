@@ -15,13 +15,17 @@ def web():
     from .web import app
     app.run(debug=False)
 
+def getDir():
+    return str(os.path.abspath(os.path.dirname(__file__)))
+
+directory = getDir()
 
 @cli.command()
-@click.option('--config', '-c', default="auth.conf",
+@click.option('--config', '-c', default=directory+"/auth.conf",
               help='Configuration file with authorization tokens.')
 @click.option('--repository', '-r', default='MI-PYT-TestRepo',
               help='Target repository which going to be processed.')
-@click.option('--rules', '-f', default='rules.conf', help='File with rules.')
+@click.option('--rules', '-f', default=directory+'/rules.conf', help='File with rules.')
 @click.option('--rate', '-x', default=60,
               help="How long to wait to another run (in seconds).")
 @click.option('--default', '-d', default="default",

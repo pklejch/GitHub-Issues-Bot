@@ -3,7 +3,6 @@ from flask import Flask
 from flask import request
 from flask import abort
 import hmac
-#from .issuelabel import readSecret, readConfig, createSession, readRules, labelIssues
 import hashlib
 from flask import render_template
 
@@ -39,7 +38,7 @@ def hook():
 
     # get name of repository
     repoName = data["repository"]["name"]
-    print(repoName)
+
     if data["action"] == "opened":
         issuelabel.labelIssues(session, repoName, username,
                          "default", False, 0,
@@ -52,6 +51,6 @@ def hook():
 def hello():
     return render_template('index.html')
 
-if __name__ == '__main__':
+def run():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(debug=True)
