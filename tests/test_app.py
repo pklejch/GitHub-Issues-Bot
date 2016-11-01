@@ -6,6 +6,11 @@ import random
 import issuelabeler
 
 
+def getDir():
+    return str(os.path.abspath(os.path.dirname(__file__)))
+
+directory = getDir()
+
 def createRandomString(size):
     return ''.join(random.choice(string.ascii_lowercase + string.digits + string.ascii_uppercase) for _ in range(size))
 
@@ -77,6 +82,15 @@ def test_createLabel(mySession, label, color):
 def test_getIssues(mySession):
     assert "Test Issue 1" in issuelabeler.issuelabel.getIssues(mySession,'MI-PYT-TestRepo',username)[-1]["title"]
 
+
+# test function readRules
+def test_readRules():
+    assert isinstance(issuelabeler.issuelabel.readRules(directory + "/../issuelabeler/rules.conf")[0],str)
+
+
+# test comments
+def test_getComments(mySession):
+    assert isinstance(issuelabeler.issuelabel.getComments(mySession, 'MI-PYT-TestRepo', username, 30)[0]["body"],str)
 
 # create testing web app
 @pytest.fixture

@@ -7,7 +7,7 @@ with open('README.md') as f:
  
 setup(
     name='issuelabeler',
-    version='0.3',
+    version='0.4',
     description='Labels unlabeled issues in GitHub repository.',
     long_description=long_description,
     author='Petr Klejch',
@@ -35,7 +35,7 @@ setup(
         ],
     },
     package_data={
-        'issuelabeler': ['static/*','templates/*']
+        'issuelabeler': ['static/*','templates/*','auth.conf.sample','rules.conf']
     },
     #include_package_data=True,
 )
