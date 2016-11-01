@@ -27,7 +27,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: WSGI :: Application'
         ],
     install_requires=['Flask', 'click>=6', 'requests'],
-    setup_requires=['pytest-runner'],
+    setup_requires=['pytest-runner','pytest'],
     tests_require=['pytest', 'betamax'],
     entry_points={
         'console_scripts': [
