@@ -4,3 +4,4 @@ include issuelabeler/auth.conf.sample
 include issuelabeler/rules.conf
 include issuelabeler/static/*
 include issuelabeler/templates/*
+recursive-include tests .*
