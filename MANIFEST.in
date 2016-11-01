@@ -5,3 +5,4 @@ include issuelabeler/rules.conf
 include issuelabeler/static/*
 include issuelabeler/templates/*
 recursive-include tests .*
+prune tests/__pycache__
