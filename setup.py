@@ -7,7 +7,7 @@ with open('README.md') as f:
  
 setup(
     name='issuelabeler',
-    version='0.4',
+    version='0.4.2',
     description='Labels unlabeled issues in GitHub repository.',
     long_description=long_description,
     author='Petr Klejch',
@@ -28,7 +28,7 @@ setup(
         ],
     install_requires=['Flask', 'click>=6', 'requests'],
     setup_requires=['pytest-runner','pytest'],
-    tests_require=['pytest', 'betamax'],
+    tests_require=['pytest', 'betamax','configparser'],
     entry_points={
         'console_scripts': [
             'issuelabeler = issuelabeler.issuelabel:main',
