@@ -10,7 +10,20 @@ app = Flask(__name__)
 
 
 def verifySecret(signature, body):
-    # create hash
+    """
+    This function will calculate SHA1 HMAC from secret and message body.
+    Secret is parsed from auth configuration file.
+
+    HMAC is then compared to a signature which was delivered in header of HTTP request.
+    If signature is correct, this tool will process HTTP request,
+    if signature is not correct HTTP error code 403 (Forbidden) is returned.
+
+
+    :param string signature: Signature from HTTP header.
+
+    :param string body: Content of HTTP POST request.
+    """
+    # create hmac
     mac = hmac.new(bytes(issuelabel.readSecret("auth.conf"), 'utf-8'),
                    msg=body, digestmod=hashlib.sha1)
 
@@ -21,6 +34,11 @@ def verifySecret(signature, body):
 
 @app.route('/hook', methods=['POST'])
 def hook():
+    """
+    This function checks /hook route. It is used for processing incoming HTTP POST request from GitHub.
+
+    :return: Empty string as response.
+    """
     data = request.get_json()
 
     # get only the signature from signature head in HTTP request
@@ -49,8 +67,18 @@ def hook():
 
 @app.route('/')
 def hello():
+    """
+    This function fill render template index.html. This template is used on default route /. It also works as simple README.
+
+    :return:
+
+    Rendered HTML file.
+    """
     return render_template('index.html')
 
 def run():
+    """
+    This function will run web mode of the tool.
+    """
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(debug=True)

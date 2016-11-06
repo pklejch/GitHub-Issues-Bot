@@ -16,6 +16,13 @@ def web():
     app.run(debug=False)
 
 def getDir():
+    """
+    This function returns directory (as a string) from which is run this tool. It is used as prefix for file path of configuration files.
+
+    :return:
+
+    String with absolute path of directory from which is this tool run.
+    """
     return str(os.path.abspath(os.path.dirname(__file__)))
 
 directory = getDir()
@@ -34,6 +41,23 @@ directory = getDir()
               help="Controls if you also search in comments.")
 @click.option('--verbose', '-v', count="True", help='Enables verbouse output.')
 def console(config, repository, rules, rate, default, comments, verbose):
+    """
+    Main wrapper function which is run from command line.
+
+    :param string config: Path of the auth configuration file.
+
+    :param string repository: Name of the repository where are issues you want to label.
+
+    :param string rules: Path of the rules configuration file.
+
+    :param int rate: How long to wait to another run (in seconds).
+
+    :param string default: Default label if none of rules will match.
+
+    :param bool comments: Controls if you also search in comments of labels.
+
+    :param int verbose: Enables verbouse output. (0 - no output, 1 - some details, 2 - debug output.)
+    """
     if verbose == 2:
         print(os.getcwd() + "\n")
         print("Parsed arguments:")
@@ -55,6 +79,15 @@ def console(config, repository, rules, rate, default, comments, verbose):
 
 
 def readConfig(config):
+    """
+    This function reads auth configuration file and returns token and username.
+
+    :param string config: Path of the auth configuration file.
+
+    :return:
+
+    Pair of strings with token and username.
+    """
     try:
         tokenConfig = configparser.ConfigParser()
         tokenConfig.read(config)
@@ -68,6 +101,15 @@ def readConfig(config):
 
 
 def readSecret(config):
+    """
+    This function reads auth configuration file and returns secret.
+
+    :param string config: Path of the auth configuration file.
+
+    :return:
+
+    String with parsed secret.
+    """
     try:
         tokenConfig = configparser.ConfigParser()
         tokenConfig.read(config)
@@ -80,6 +122,15 @@ def readSecret(config):
 
 
 def readRules(rules):
+    """
+    This function reads rules configuration file.
+
+    :param string rules: Path of the file with rules.
+
+    :return:
+
+    List with lines from configuration file.
+    """
     try:
         with open(rules) as f:
             content = f.readlines()
@@ -90,6 +141,16 @@ def readRules(rules):
 
 
 def createSession(token):
+    """
+    This function creates new session for communicating with GitHub. Session is then used for all functions which communicate with GitHub.
+
+    :param string token: Parsed token from auth configuration file, see :func:`readConfig`.
+
+    :return:
+
+    Created session.
+    """
+
     session = requests.Session()
     session.headers = {'Authorization': 'token ' + token,
                        'User-Agent': 'Python'}
@@ -98,7 +159,19 @@ def createSession(token):
 
 # get all issues of specified repository
 def getIssues(session, repository, username):
+    """
+    This function fetches all issues from specified repository.
 
+    :param session: Already created session with valid token, see :func:`createSession`.
+
+    :param string repository: Repository which contains issues from which you want to get comments.
+
+    :param string username: Name of the user which owns repository
+
+    :return:
+
+    List of dictionaries with issues.
+    """
     query = "https://api.github.com/repos/" \
             + username + "/" + repository + "/issues"
     try:
@@ -120,6 +193,26 @@ def getIssues(session, repository, username):
 
 def labelIssues(session, repository, username,
                 default, comments, verbose, content, issues):
+    """
+    Main function of a program.
+
+    :param session: Already created session with valid token, see :func:`createSession`.
+
+    :param string repository: Repository which contains issues you want to label.
+
+    :param string username: Name of the user which owns repository.
+
+    :param string default: Default label if none of rules will match.
+
+    :param bool comments: Controls if comments of issues are searched for match.
+
+    :param int verbose: Verbose level.
+
+    :param list[String] content: List with parsed lines from rules configuration file.
+
+    :param list[Dict] issues: List of dictionaries with issues.
+
+    """
     # launching labelIssues from console, fetch all issues from repository
     if issues is None:
         issues = getIssues(session, repository, username)
@@ -202,6 +295,21 @@ def labelIssues(session, repository, username,
 
 
 def testAndCreateLabel(session, repository, username, label, color, verbose):
+    """
+    This function tests if specified label exists and if not it will create new label. It uses functions :func:`getLabel` and :func:`createLabel`.
+
+    :param session: Already created session with valid token, see :func:`createSession`.
+
+    :param string repository: Repository where you want to test and create label.
+
+    :param string username: Name of the user which owns repository.
+
+    :param string label: Name of the label you want to test.
+
+    :param string color: Color of label in RGB hex format, without "#" prefix.
+
+    :param int verbose: Verbose level.
+    """
     # check if label with this name exists
     if not getLabel(session, repository, username, label):
         # if label doesnt exist, create it
@@ -214,6 +322,23 @@ def testAndCreateLabel(session, repository, username, label, color, verbose):
 
 
 def getLabel(session, repository, username, name):
+    """
+    This function tests if label exists or not.
+    It is used in function :func:`testAndCreateLabel`.
+
+    :param session: Already created session with valid token, see :func:`createSession`.
+
+    :param string repository: Repository which contains label you want to test.
+
+    :param string username: Name of the user which owns repository.
+
+    :param string name: Name of the label you want to test.
+
+    :return:
+
+    True if label exists in repository, False if not.
+
+    """
     query = "https://api.github.com/repos/"\
             + username + "/" + repository + "/labels/" + name
     r = session.get(query)
@@ -224,6 +349,21 @@ def getLabel(session, repository, username, name):
 
 
 def getComments(session, repository, username, number):
+    """
+    This fetches all comments from issue.
+
+    :param session: Already created session with valid token, see :func:`createSession`.
+
+    :param string repository: Repository which contains issue from which you want to get comments.
+
+    :param string username: Name of the user which owns repository.
+
+    :param int number: Number of issue from which you want get comments.
+
+    :return:
+
+    List of dictionaries with comments.
+    """
     query = "https://api.github.com/repos/" + \
             username + "/" + repository + \
             "/issues/" + str(number) + "/comments"
@@ -245,6 +385,21 @@ def getComments(session, repository, username, number):
 
 
 def createLabel(session, repository, username, label, color):
+    """
+    This function creates new label.
+    It is user responsibility to check if label already exists or not, see :func:`testAndCreateLabel`.
+
+    :param session: Already created session with valid token, see :func:`createSession`.
+
+    :param string repository: Repository where you want to create label.
+
+    :param string username: Name of the user which owns repository.
+
+    :param string label: Name of the label you want to create.
+
+    :param string color: Color of label in RGB hex format, without "#" prefix.
+
+    """
     query = "https://api.github.com/repos/" +\
             username + "/" + repository + "/labels"
     try:
@@ -264,7 +419,23 @@ def createLabel(session, repository, username, label, color):
         exit(1)
 
 
+
 def addLabel(session, repository, username, label, number):
+    """
+    This function add existing label to a specified issue.
+    It is user responsibility to check if label exists or not, see :func:`testAndCreateLabel`.
+
+    :param session: Already created session with valid token, see :func:`createSession`.
+
+    :param string repository: Repository which contains issue you want to label.
+
+    :param string username: Name of the user which owns repository.
+
+    :param string label: Name of the label you want to add.
+
+    :param int number: Number of issue you want to label.
+
+    """
     query = "https://api.github.com/repos/" +\
             username + "/" + repository + "/issues/" + str(number) + "/labels"
     try:
@@ -284,4 +455,8 @@ def addLabel(session, repository, username, label, number):
 
 
 def main():
+    """
+    Wrapper function for function :func:`cli`.
+    This is entry point of this tool.
+    """
     cli()

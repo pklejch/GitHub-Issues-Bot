@@ -14,6 +14,8 @@ Contents:
    about
    setupguide
    using
+   issuelabeler
+   howitworks
 
 
 Indices and tables

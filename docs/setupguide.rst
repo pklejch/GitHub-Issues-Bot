@@ -102,4 +102,3 @@ For example:
    ([0-9]{1,3}\.){3}[0-9]{1,3}=ipv4,66cccc
 
 This rule will label all issues which contain IPv4 address with tag "ipv4" with color #66cccc.
-
