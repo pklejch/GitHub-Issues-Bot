@@ -81,6 +81,14 @@ Create new token, copy it into clipboard and paste it into configuration file.
 It contains secret which has to be same as you specified while creating webhook.
 For instructions to create webhook see chapter :ref:`web-label`.
 
+Package already contains sample configuration file *auth.conf.sample*, you can rename it to *auth.conf* by using following command
+
+.. code::
+
+   mv auth.conf.sample auth.conf
+
+And then edit it and fill correct values.
+
 .. _rules-label:
 
 Rules configuration file
