@@ -7,7 +7,7 @@ with open('README.md') as f:
  
 setup(
     name='issuelabeler',
-    version='0.4.2',
+    version='0.5',
     description='Labels unlabeled issues in GitHub repository.',
     long_description=long_description,
     author='Petr Klejch',
