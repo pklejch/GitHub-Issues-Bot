@@ -6,18 +6,6 @@ Lets see simple example how to label unlabeled issues in your GitHub repository.
 .. testsetup::
 
    import issuelabeler
-   import betamax
-   from requests import Session
-
-   with betamax.Betamax.configure() as config:
-      TOKEN = 'false_token'
-      username = 'noname'
-      config.default_cassette_options['record_mode'] = 'none'
-      config.cassette_library_dir = '../tests/fixtures/cassettes'
-   ses=Session()
-   betamax_session = betamax.Betamax(ses)
-   betamax_session.headers = {'Authorization': 'token ' + '<TOKEN>',
-                               'User-Agent': 'Python'}
    directory = issuelabeler.issuelabel.getDir()
 
 1. You have to read auth configuration file to get token, username and secret (only used in Web mode).

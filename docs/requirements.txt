@@ -1,2 +1,3 @@
 sphinx
-betamax
+click
+requests
