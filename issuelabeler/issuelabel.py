@@ -210,8 +210,8 @@ def labelIssues(session, repository, username,
 
     :param list[String] content: List with parsed lines from rules configuration file.
 
-    :param list[Dict] issues: List of dictionaries with issues. You can also enter None,
-    in that case all issues will be fetched from repository.
+    :param list[Dict] issues: List of dictionaries with issues.
+    You can also enter None, in that case all issues will be fetched from repository.
 
     """
     # launching labelIssues from console, fetch all issues from repository
