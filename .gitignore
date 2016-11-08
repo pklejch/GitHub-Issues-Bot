@@ -91,3 +91,5 @@ ENV/
 *~
 auth.conf
 .idea
+!docs/_static
+!docs/_templates
