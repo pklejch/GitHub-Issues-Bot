@@ -10,19 +10,19 @@ How to test
 -----------
 Run:
 
-:: code
+.. code::
 
    python setup.py test
 
 or
 
-:: code
+.. code::
 
    pytest -v tests/test_app.py
 
 If you have filled auth.conf with right values, you can use online testing. With real HTTP requests. Old cassettes will be rewrited. Eg:
 
-:: code
+.. code::
 
    AUTH_FILE=issuelabeler/auth.conf pytest -v tests/test_app.py
 
@@ -34,31 +34,31 @@ How to build documentation
 
 Create virtual enviroment with:
 
-:: code
+.. code::
 
    python3 -m venv env
 
 Activate virtual enviroment:
 
-:: code
+.. code::
 
    . env/bin/activate
 
 Change your working directory to docs:
 
-:: code
+.. code::
 
    cd docs/
 
 Install dependencies:
 
-:: code 
+.. code::
 
    python -m pip install -r requirements.txt
 
 To build documentation in HTML format, run following command:
 
-:: code
+.. code::
 
    make html
 
@@ -67,6 +67,6 @@ You can start reading documentation by opening _build/html/index.html in your br
 
 To run doctests run command:
 
-:: code
+.. code::
 
    make doctest
